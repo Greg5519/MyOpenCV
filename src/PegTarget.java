@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 
+import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
@@ -15,6 +16,18 @@ public class PegTarget {
 	private boolean isEstablished;	// Target consists of at least one contour.
 	private boolean isComplete;		// Target consists of both contours.
 	
+	// Vital Target Statistics determined from target contours
+	private int leftEdge;
+	private int rightEdge;
+	private int topEdge;
+	private int bottomEdge;
+	private int maxWidth;
+	private int maxHeight;
+	private int maxArea;
+	private double aspectRatio;
+	private int centreX;
+	
+	
 	/**
 	 * 
 	 * @param candidateCountours
@@ -22,11 +35,73 @@ public class PegTarget {
 	public PegTarget(ArrayList<MatOfPoint> candidateCountours) {
 		isEstablished = false;;
 		isComplete = false;
+		resetStatistics();
 		targetContours = parseContours(candidateCountours);
-		if (targetContours[leftContour] != null) {isEstablished = true;}
-		if (targetContours[rightContour] != null) {isComplete = true;}
+		if (targetContours[rightContour] != null) {
+			// Target consists of TWO contours - So it is complete
+			isEstablished = true;
+			isComplete = true;
+			establishStatistics(targetContours[leftContour],targetContours[rightContour]);
+		} else if (targetContours[leftContour] != null) {
+			// Target consists of ONLY ONE contour - Which is sort of ok but NOT complete
+			// NOTE: In this case the left contour is also the right contour
+			isEstablished = true;
+			isComplete = false;
+			establishStatistics(targetContours[leftContour],targetContours[leftContour]);
+		} else {
+			// Target consists of NO contours - We have NO valid target
+			isEstablished = false;;
+			isComplete = false;
+			resetStatistics();
+		}
 	}
 	
+	private void resetStatistics() {
+		leftEdge = 0;
+		rightEdge = 0;
+		topEdge = 0;
+		bottomEdge = 0;
+		maxWidth = 0;
+		maxHeight = 0;
+		maxArea = 0;
+		aspectRatio = 0.0;
+		centreX = 0;
+	}
+	
+	private void establishStatistics(PegContour leftSide, PegContour rightSide) {
+		resetStatistics();
+		// Remember that Top Left Corner is (0,0) so...
+		// Horizontal position uses X value increasing from left to tight
+		// Vertical position uses Y value increasing from top to bottom
+		Rect lRect = leftSide.getBoundingRectangle();
+		Rect rRect = rightSide.getBoundingRectangle();
+		leftEdge = lRect.x;
+		rightEdge = rRect.x + rRect.width;
+		topEdge = Math.min(lRect.y, rRect.y);
+		bottomEdge = Math.max((lRect.y + lRect.height), (rRect.y + rRect.height));
+		maxWidth = rightEdge - leftEdge;
+		maxHeight = bottomEdge - topEdge;
+		maxArea = maxWidth * maxHeight;
+		aspectRatio = ((double) maxWidth) / ((double) maxHeight);
+		centreX = leftEdge + (maxWidth/2);
+	}
+
+	public void dumpStatistics() {
+		System.out.println("Dumping Target Statistics...");
+		System.out.println(String.format("isEstablished= %s. isComplete= %s", isEstablished,isComplete ));
+		System.out.println(String.format("leftEdge= %s. rightEdge= %s", leftEdge,rightEdge ));
+		System.out.println(String.format("topEdge= %s. bottomEdge= %s", topEdge,bottomEdge ));
+		System.out.println(String.format("maxWidth= %s. maxHeight= %s", maxWidth,maxHeight ));
+		System.out.println(String.format("maxArea= %s. aspectRatio= %s", maxArea,aspectRatio ));
+		System.out.println(String.format("centreX= %s. centreX= %s", centreX,centreX ));
+	}
+	
+	public void drawOnImage(Mat imgSource) {
+		if (isEstablished) {
+			Imgproc.rectangle(imgSource, new Point(leftEdge, topEdge), new Point(rightEdge, bottomEdge), new Scalar(0, 255, 255));
+		}
+	}
+
 	/**
 	 * Parse a raw list of a bunch of image contours to narrow down the list to those contours 
 	 * that match the peg target specifications and then to further narrow down the list to 

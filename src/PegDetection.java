@@ -27,7 +27,7 @@ public class PegDetection {
 		System.loadLibrary( Core.NATIVE_LIBRARY_NAME );
 		
 	    System.out.println("\nRunning Peg Detection Pipeline");
-	    inFile = new File("Resources/Peg_215_Angle45_Feb01.jpg");
+	    inFile = new File("Resources/Peg_215_Angle0_Feb01.jpg");
 	    inPath = inFile.getAbsolutePath();
 	    outFile = new File("Resources/pegDetection.jpg");
 	    outPath = outFile.getAbsolutePath();
@@ -39,8 +39,8 @@ public class PegDetection {
         
         //Mat imgSink = pipeline.hslThresholdOutput();
         
-        ArrayList<MatOfPoint> contourDetections = pipeline.findContoursOutput();  // NOTE!!! Should use filtered Mat!
-        //ArrayList<MatOfPoint> contourDetections = pipeline.filterContoursOutput();
+        //ArrayList<MatOfPoint> contourDetections = pipeline.findContoursOutput();  // NOTE!!! Should use filtered Mat!
+        ArrayList<MatOfPoint> contourDetections = pipeline.filterContoursOutput();
 	    System.out.println(String.format("Detected %s contours", contourDetections.size()));
 	    
 	    PegTarget pegTarget = new PegTarget(contourDetections);
@@ -58,6 +58,8 @@ public class PegDetection {
 	    } else {
 	    	System.out.println("Target is NOT Established.");
 	    }
+	    pegTarget.dumpStatistics();
+	    pegTarget.drawOnImage(imgSource);
 	    
 	    // Draw a bounding box around each face.
 	    //for (MatOfPoint contour : contourDetections) {
