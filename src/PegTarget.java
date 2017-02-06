@@ -93,13 +93,32 @@ public class PegTarget {
 		System.out.println(String.format("topEdge= %s. bottomEdge= %s", topEdge,bottomEdge ));
 		System.out.println(String.format("maxWidth= %s. maxHeight= %s", maxWidth,maxHeight ));
 		System.out.println(String.format("maxArea= %s. aspectRatio= %s", maxArea,aspectRatio ));
-		System.out.println(String.format("centreX= %s. centreX= %s", centreX,centreX ));
+		System.out.println(String.format("centreX= %s. Distance= %s", centreX, estimateDistance() ));
 	}
 	
 	public void drawOnImage(Mat imgSource) {
 		if (isEstablished) {
 			Imgproc.rectangle(imgSource, new Point(leftEdge, topEdge), new Point(rightEdge, bottomEdge), new Scalar(0, 255, 255));
 		}
+	}
+	
+	public double estimateDistance() {
+		double targetHeightInMeters = (5.0 / 39.37);	// 5 inches / 39.37 inches per meter
+		double targetWidthInMeters = (10.25 / 39.37);	// 10.25 inches / 39.37 inches per meter
+		double axisHorizontalViewAngle = Math.toRadians(49.0);	// 49 degrees from published specs;
+		double axisVerticalViewAngle = Math.toRadians(39.80);	// Estimated (49 degrees * 240/320) based on resolution change;
+		double tanHorizontalAngle = Math.tan(axisHorizontalViewAngle);
+		double tanVerticalAngle = Math.tan(axisVerticalViewAngle);
+		double xResolution = 320.0;		// Resolution is 320x240 pixels
+		double yResolution = 240.0;		// Resolution is 320x240 pixels
+		double dist = 99.9;
+		if (isEstablished) {
+			dist = targetWidthInMeters * xResolution / (2.0 * maxWidth * tanHorizontalAngle);
+			dist = targetWidthInMeters * xResolution / (maxWidth * tanHorizontalAngle);
+			dist = targetHeightInMeters * yResolution / (2.0 * maxHeight * tanVerticalAngle);
+			dist = targetHeightInMeters * yResolution / (maxHeight * tanVerticalAngle);
+		}
+		return dist;
 	}
 
 	/**
