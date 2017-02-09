@@ -88,12 +88,13 @@ public class PegTarget {
 
 	public void dumpStatistics() {
 		System.out.println("Dumping Target Statistics...");
-		System.out.println(String.format("isEstablished= %s. isComplete= %s", isEstablished,isComplete ));
-		System.out.println(String.format("leftEdge= %s. rightEdge= %s", leftEdge,rightEdge ));
-		System.out.println(String.format("topEdge= %s. bottomEdge= %s", topEdge,bottomEdge ));
-		System.out.println(String.format("maxWidth= %s. maxHeight= %s", maxWidth,maxHeight ));
-		System.out.println(String.format("maxArea= %s. aspectRatio= %s", maxArea,aspectRatio ));
-		System.out.println(String.format("centreX= %s. Distance= %s", centreX, estimateDistance() ));
+		//System.out.println(String.format("isEstablished= %s. isComplete= %s", isEstablished,isComplete ));
+		//System.out.println(String.format("leftEdge= %s. rightEdge= %s", leftEdge,rightEdge ));
+		//System.out.println(String.format("topEdge= %s. bottomEdge= %s", topEdge,bottomEdge ));
+		//System.out.println(String.format("maxWidth= %s. maxHeight= %s", maxWidth,maxHeight ));
+		//System.out.println(String.format("maxArea= %s. aspectRatio= %s", maxArea,aspectRatio ));
+		//System.out.println(String.format("centreX= %s. Distance= %s", centreX, estimateDistance() ));
+		System.out.println(String.format("maxHeight= %s. Distance= %s", maxHeight, estimateDistance() ));
 	}
 	
 	public void drawOnImage(Mat imgSource) {
@@ -117,6 +118,8 @@ public class PegTarget {
 			dist = targetWidthInMeters * xResolution / (maxWidth * tanHorizontalAngle);
 			dist = targetHeightInMeters * yResolution / (2.0 * maxHeight * tanVerticalAngle);
 			dist = targetHeightInMeters * yResolution / (maxHeight * tanVerticalAngle);
+			dist = targetWidthInMeters * xResolution / (maxWidth);
+			dist = (49.18/maxHeight)-0.29;
 		}
 		return dist;
 	}
