@@ -27,7 +27,7 @@ public class PegDetection {
 		System.loadLibrary( Core.NATIVE_LIBRARY_NAME );
 		
 	    System.out.println("\nRunning Peg Detection Pipeline");
-	    inFile = new File("Resources/Peg_075_Angle0_Feb08.jpg");
+	    inFile = new File("Resources/Peg_300_Angle30L_Feb08.jpg");
 	    inPath = inFile.getAbsolutePath();
 	    outFile = new File("Resources/pegDetectionOutput.jpg");
 	    outPath = outFile.getAbsolutePath();

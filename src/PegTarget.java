@@ -104,6 +104,8 @@ public class PegTarget {
 	}
 	
 	public double estimateDistance() {
+		/**
+		 * Distance Calculations based on FRC documentation and examples
 		double targetHeightInMeters = (5.0 / 39.37);	// 5 inches / 39.37 inches per meter
 		double targetWidthInMeters = (10.25 / 39.37);	// 10.25 inches / 39.37 inches per meter
 		double axisHorizontalViewAngle = Math.toRadians(49.0);	// 49 degrees from published specs;
@@ -112,14 +114,21 @@ public class PegTarget {
 		double tanVerticalAngle = Math.tan(axisVerticalViewAngle);
 		double xResolution = 320.0;		// Resolution is 320x240 pixels
 		double yResolution = 240.0;		// Resolution is 320x240 pixels
+		*/
 		double dist = 99.9;
 		if (isEstablished) {
+			/**
+			 * Distance Calculations based on FRC documentation and examples
 			dist = targetWidthInMeters * xResolution / (2.0 * maxWidth * tanHorizontalAngle);
 			dist = targetWidthInMeters * xResolution / (maxWidth * tanHorizontalAngle);
 			dist = targetHeightInMeters * yResolution / (2.0 * maxHeight * tanVerticalAngle);
 			dist = targetHeightInMeters * yResolution / (maxHeight * tanVerticalAngle);
 			dist = targetWidthInMeters * xResolution / (maxWidth);
-			dist = (49.18/maxHeight)-0.29;
+			*/
+			// Distance function based on data collected and excel spreadsheet regression analysis
+			double kConstant = 62.306;
+			double kPower = 1.1336;
+			dist = kConstant * Math.pow((1.00/maxHeight), kPower);
 		}
 		return dist;
 	}
